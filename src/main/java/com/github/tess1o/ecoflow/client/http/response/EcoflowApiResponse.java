@@ -1,6 +1,7 @@
-package com.github.tess1o.ecoflow.client.http.responses;
+package com.github.tess1o.ecoflow.client.http.response;
 
-public class EcoflowApiResponse <T>{
+public class EcoflowApiResponse<T> {
+
     private String code;
     private String message;
     private T data;

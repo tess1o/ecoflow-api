@@ -1,4 +1,6 @@
-package com.github.tess1o.encryption;
+package com.github.tess1o.ecoflow.encryption;
+
+import com.github.tess1o.ecoflow.exceptions.EcoflowException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -14,7 +16,7 @@ public class EncryptionService {
             sha256HMAC.init(secret_key);
             return toHexString(sha256HMAC.doFinal(message.getBytes()));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new EcoflowException(e);
         }
     }
 

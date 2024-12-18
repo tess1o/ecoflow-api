@@ -1,11 +1,11 @@
-package com.github.tess1o.ecoflow.client.http.responses;
+package com.github.tess1o.ecoflow.client.http.response;
 
 public class EcoflowDevice {
+
     private String sn;
     private int online;
     private String productName;
 
-    // Getters and Setters
     public String getSn() {
         return sn;
     }
@@ -29,7 +29,7 @@ public class EcoflowDevice {
     public void setProductName(String productName) {
         this.productName = productName;
     }
-    
+
 
     @Override
     public String toString() {

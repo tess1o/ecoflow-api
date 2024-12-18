@@ -1,24 +1,45 @@
-package com.github.tess1o.http;
+package com.github.tess1o.ecoflow.client.http;
 
-import com.github.tess1o.exceptions.EcoflowInvalidParameterException;
+import com.github.tess1o.ecoflow.exceptions.EcoflowInvalidParameterException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class QueryString {
 
     private final JSONObject request;
+    private volatile String queryString;
+
 
     public QueryString(JSONObject request) {
         this.request = request;
     }
 
-    public String get() {
+    public QueryString(Map<String, Object> jsonAsMap) {
+        this.request = new JSONObject(jsonAsMap);
+    }
+
+    public QueryString(String json) {
+        this.request = new JSONObject(json);
+    }
+
+    public boolean isEmpty() {
+        return this.request == null || this.request.isEmpty();
+    }
+
+    public String toQueryString() {
+        if (queryString == null) {
+            synchronized (this) { // Thread-safety if needed
+                if (queryString == null) {
+                    queryString = calculateQueryString();
+                }
+            }
+        }
+        return queryString;
+    }
+
+    private String calculateQueryString() {
         SortedMap<String, Object> query = requestToMap(this.request);
         if (query.isEmpty()) {
             return "";
@@ -35,20 +56,10 @@ public class QueryString {
         }
         return builder.substring(0, builder.length() - 1);
     }
-//    public String get() {
-//        SortedMap<String, Object> query = requestToMap(this.request);
-//        if (query.isEmpty()) {
-//            return "";
-//        }
-//
-//        return query.entrySet().stream()
-//                .map(entry -> entry.getKey() + "=" + entry.getValue())
-//                .collect(Collectors.joining("&"));
-//    }
 
     private SortedMap<String, Object> requestToMap(JSONObject jsonObject) {
         if (jsonObject == null || jsonObject.isEmpty()) {
-            throw new EcoflowInvalidParameterException("parameter invalid");
+            throw new EcoflowInvalidParameterException("parameters are empty");
         }
         SortedMap<String, Object> map = new TreeMap<>();
         for (String key : jsonObject.keySet()) {
@@ -60,7 +71,7 @@ public class QueryString {
 
     private Map<String, Object> getByObject(String key, Object value) {
         if (key == null || key.isEmpty() || value == null) {
-            throw new EcoflowInvalidParameterException("parameter invalid");
+            throw new EcoflowInvalidParameterException("parameters are empty");
         }
         if (value instanceof JSONArray) {
             return getByJsonArray(key, (JSONArray) value);
@@ -75,7 +86,7 @@ public class QueryString {
 
     private Map<String, Object> getByJsonArray(String key, JSONArray value) {
         if (key == null || key.isEmpty() || value == null || value.isEmpty()) {
-            throw new EcoflowInvalidParameterException("parameter invalid");
+            throw new EcoflowInvalidParameterException("either key or value is null or empty in the json array");
         }
         Map<String, Object> map = new HashMap<>();
         for (int i = 0; i < value.length(); i++) {
@@ -86,7 +97,7 @@ public class QueryString {
 
     private Map<String, Object> getByJSONObject(String key, JSONObject value) {
         if (key == null || key.isEmpty() || value == null || value.isEmpty()) {
-            throw new EcoflowInvalidParameterException("parameter invalid");
+            throw new EcoflowInvalidParameterException("either key or value is null or empty in the json object");
         }
         Map<String, Object> map = new HashMap<>();
         for (String innerKey : value.keySet()) {
@@ -101,5 +112,23 @@ public class QueryString {
 
     private String getArrayKey(String key, int index) {
         return key + "[" + index + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        QueryString that = (QueryString) o;
+        return Objects.equals(request, that.request);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(request);
+    }
+
+    @Override
+    public String toString() {
+        return queryString;
     }
 }

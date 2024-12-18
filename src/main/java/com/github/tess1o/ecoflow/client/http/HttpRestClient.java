@@ -4,11 +4,13 @@ import org.json.JSONObject;
 
 import java.net.http.HttpResponse;
 
-public interface HttpClient {
+public interface HttpRestClient {
 
-    HttpResponse<String> executeGet(String url) throws Exception;
+    HttpResponse<String> get(String url, JSONObject queryParams);
 
-    HttpResponse<String> executeGet(String url, JSONObject queryParams) throws Exception;
+    HttpResponse<String> post(String url, JSONObject queryParams);
 
-    HttpResponse<String> executePost(String url, JSONObject queryParams) throws Exception;
+    default HttpResponse<String> get(String url) {
+        return get(url, null);
+    }
 }
