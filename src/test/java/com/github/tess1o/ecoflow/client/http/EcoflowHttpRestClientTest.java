@@ -98,7 +98,7 @@ class EcoflowHttpRestClientTest {
         );
 
         HttpRestClient client = new EcoflowHttpRestClient(SERVER_URL, accessToken, secretToken);
-        HttpResponse<String> status = client.get(apiUrl, queryParams);
+        HttpResponse<String> status = client.get(apiUrl, new QueryString(queryParams));
 
         // Verify the request
         verify(getRequestedFor(urlPathEqualTo(apiUrl))
@@ -120,6 +120,8 @@ class EcoflowHttpRestClientTest {
         final JSONObject queryParams = new JSONObject();
         queryParams.put("sn", "device1");
 
+        QueryString queryString = new QueryString(queryParams);
+
         final String apiUrl = "/iot-open/sign/device/quota";
 
         stubFor(post(urlPathEqualTo(apiUrl))
@@ -131,12 +133,12 @@ class EcoflowHttpRestClientTest {
         );
 
         HttpRestClient client = new EcoflowHttpRestClient(SERVER_URL, accessToken, secretToken);
-        HttpResponse<String> status = client.post(apiUrl, queryParams);
+        HttpResponse<String> status = client.post(apiUrl, queryString);
 
         // Verify the request
         verify(postRequestedFor(urlPathEqualTo(apiUrl))
                 .withQueryParam("sn", equalTo("device1"))
-                .withRequestBody(equalToJson(queryParams.toString()))
+                .withRequestBody(equalTo(queryString.toQueryString()))
                 .withHeader("accessKey", matching(accessToken))
                 .withHeader("timestamp", matching(".*"))
                 .withHeader("nonce", matching(".*"))

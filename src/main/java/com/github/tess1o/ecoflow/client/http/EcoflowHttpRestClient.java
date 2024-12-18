@@ -44,31 +44,30 @@ public class EcoflowHttpRestClient implements HttpRestClient {
         this(DEFAULT_BASE_URL, accessToken, secretToken, HttpClient.newHttpClient());
     }
 
-    public HttpResponse<String> get(String url, JSONObject queryParams) throws EcoflowHttpException {
-        return prepareAndSendRequest(url, queryParams, "GET");
+    public HttpResponse<String> get(String url, QueryString query) throws EcoflowHttpException {
+        return prepareAndSendRequest(url, query, "GET");
     }
 
-    public HttpResponse<String> post(String url, JSONObject queryParams) throws EcoflowHttpException {
-        return prepareAndSendRequest(url, queryParams, "POST");
-    }
-
-    @Override
-    public HttpResponse<String> put(String url, JSONObject queryParams) {
-        return prepareAndSendRequest(url, queryParams, "PUT");
+    public HttpResponse<String> post(String url, QueryString query) throws EcoflowHttpException {
+        return prepareAndSendRequest(url, query, "POST");
     }
 
     @Override
-    public HttpResponse<String> delete(String url, JSONObject queryParams) {
-        return prepareAndSendRequest(url, queryParams, "DELETE");
+    public HttpResponse<String> put(String url, QueryString query) {
+        return prepareAndSendRequest(url, query, "PUT");
     }
 
-    private HttpRequest prepareRequest(String url, JSONObject queryParams, String method) throws EcoflowHttpException {
+    @Override
+    public HttpResponse<String> delete(String url, QueryString query) {
+        return prepareAndSendRequest(url, query, "DELETE");
+    }
+
+    private HttpRequest prepareRequest(String url, QueryString queryParams, String method) throws EcoflowHttpException {
         if ((method.equals("POST") || method.equals("PUT")) && queryParams == null) {
             throw new EcoflowInvalidParameterException("Body request for POST and PUT requests are mandatory");
         }
-        QueryString queryString = queryParams == null ? null : new QueryString(queryParams);
-        String fullUrl = (queryString == null || queryString.isEmpty()) ? baseUrl + url : baseUrl + url + "?" + queryString.toQueryString();
-        AuthHeaders authHeaders = queryParams == null ? new AuthHeaders(accessToken, secretToken) : new AuthHeaders(queryString, accessToken, secretToken);
+        String fullUrl = (queryParams == null || queryParams.isEmpty()) ? baseUrl + url : baseUrl + url + "?" + queryParams.toQueryString();
+        AuthHeaders authHeaders = queryParams == null ? new AuthHeaders(accessToken, secretToken) : new AuthHeaders(queryParams, accessToken, secretToken);
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .uri(URI.create(fullUrl));
 
@@ -85,8 +84,8 @@ public class EcoflowHttpRestClient implements HttpRestClient {
         return requestBuilder.headers(authHeaders.toHeadersArray()).build();
     }
 
-    private HttpResponse<String> prepareAndSendRequest(String url, JSONObject queryParams, String method) throws EcoflowHttpException {
-        HttpRequest request = prepareRequest(url, queryParams, method);
+    private HttpResponse<String> prepareAndSendRequest(String url, QueryString query, String method) throws EcoflowHttpException {
+        HttpRequest request = prepareRequest(url, query, method);
         return sendRequest(request);
     }
 

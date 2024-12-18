@@ -11,7 +11,6 @@ public class QueryString {
     private final JSONObject request;
     private volatile String queryString;
 
-
     public QueryString(JSONObject request) {
         this.request = request;
     }

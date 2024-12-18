@@ -40,7 +40,7 @@ public class EcoflowClient {
         JSONObject queryParams = new JSONObject();
         queryParams.put("sn", sn);
 
-        HttpResponse<String> response = restClient.get(GET_ALL_QUOTA_URL, queryParams);
+        HttpResponse<String> response = restClient.get(GET_ALL_QUOTA_URL, new QueryString(queryParams));
         if (response.statusCode() != 200) {
             throw new EcoflowHttpException(response.body());
         }
@@ -59,7 +59,7 @@ public class EcoflowClient {
         requestParams.put("sn", sn);
         requestParams.put("params", paramsObject);
 
-        HttpResponse<String> response = restClient.post(GET_QUOTA_URL, requestParams);
+        HttpResponse<String> response = restClient.post(GET_QUOTA_URL, new QueryString(requestParams));
         if (response.statusCode() != 200) {
             throw new EcoflowHttpException(response.body());
         }
