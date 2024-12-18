@@ -28,7 +28,7 @@ public class EcoflowClient {
         this.responseParser = new EcoflowRestApiResponseParser();
     }
 
-    public List<EcoflowDevice> getDevices() throws Exception {
+    public List<EcoflowDevice> getDevices() {
         HttpResponse<String> response = restClient.get(DEVICE_LIST_URL);
         if (response.statusCode() != 200) {
             throw new EcoflowHttpException(response.body());
@@ -36,7 +36,7 @@ public class EcoflowClient {
         return responseParser.parseDevicesResponse(response.body()).getData();
     }
 
-    public Map<String, Object> getDeviceAllParameters(String sn) throws Exception {
+    public Map<String, Object> getDeviceAllParameters(String sn) {
         JSONObject queryParams = new JSONObject();
         queryParams.put("sn", sn);
 
@@ -47,12 +47,11 @@ public class EcoflowClient {
         return responseParser.parseParamsResponse(response.body()).getData();
     }
 
-    public Map<String, Object> getDeviceParameters(String sn, List<String> params) throws Exception {
+    public Map<String, Object> getDeviceParameters(String sn, List<String> params) {
         JSONArray quotas = new JSONArray();
         for (String param : params) {
             quotas.put(param);
         }
-
         JSONObject paramsObject = new JSONObject();
         paramsObject.put("quotas", quotas);
 

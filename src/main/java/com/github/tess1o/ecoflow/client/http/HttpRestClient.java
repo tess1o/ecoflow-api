@@ -10,6 +10,10 @@ public interface HttpRestClient {
 
     HttpResponse<String> post(String url, JSONObject queryParams);
 
+    HttpResponse<String> put(String url, JSONObject queryParams);
+
+    HttpResponse<String> delete(String url, JSONObject queryParams);
+
     default HttpResponse<String> get(String url) {
         return get(url, null);
     }
