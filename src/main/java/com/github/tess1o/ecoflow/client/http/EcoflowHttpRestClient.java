@@ -62,7 +62,7 @@ public class EcoflowHttpRestClient implements HttpRestClient {
         return prepareAndSendRequest(url, query, "DELETE");
     }
 
-    private HttpRequest prepareRequest(String url, QueryString queryParams, String method) throws EcoflowHttpException {
+    private HttpRequest prepareRequest(String url, QueryString queryParams, String method) {
         if ((method.equals("POST") || method.equals("PUT")) && queryParams == null) {
             throw new EcoflowInvalidParameterException("Body request for POST and PUT requests are mandatory");
         }
@@ -84,7 +84,7 @@ public class EcoflowHttpRestClient implements HttpRestClient {
         return requestBuilder.headers(authHeaders.toHeadersArray()).build();
     }
 
-    private HttpResponse<String> prepareAndSendRequest(String url, QueryString query, String method) throws EcoflowHttpException {
+    private HttpResponse<String> prepareAndSendRequest(String url, QueryString query, String method) {
         HttpRequest request = prepareRequest(url, query, method);
         return sendRequest(request);
     }

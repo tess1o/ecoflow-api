@@ -149,5 +149,67 @@ class EcoflowHttpRestClientTest {
         assertEquals("application/json", status.headers().firstValue("Content-Type").orElse(null));
     }
 
+    @Test
+    void testPutRequestWithQueryString() {
+        final String accessToken = "accessToken1";
+        final String secretToken = "secretToken1";
+        final JSONObject queryParams = new JSONObject();
+        queryParams.put("sn", "device1");
 
+        QueryString queryString = new QueryString(queryParams);
+
+        final String apiUrl = "/iot-open/sign/device/quota";
+
+        stubFor(put(urlPathEqualTo(apiUrl))
+                .withQueryParam("sn", equalTo("device1"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                )
+        );
+
+        HttpRestClient client = new EcoflowHttpRestClient(SERVER_URL, accessToken, secretToken);
+        HttpResponse<String> status = client.put(apiUrl, queryString);
+
+        // Verify the request
+        verify(putRequestedFor(urlPathEqualTo(apiUrl))
+                .withQueryParam("sn", equalTo("device1"))
+                .withRequestBody(equalTo(queryString.toQueryString()))
+                .withHeader("accessKey", matching(accessToken))
+                .withHeader("timestamp", matching(".*"))
+                .withHeader("nonce", matching(".*"))
+                .withHeader("sign", matching(".*")));
+
+        // Assert response
+        assertEquals(200, status.statusCode());
+        assertEquals("application/json", status.headers().firstValue("Content-Type").orElse(null));
+    }
+
+    @Test
+    void testDeleteRequestWithoutQueryString() {
+        final String accessToken = "accessToken1";
+        final String secretToken = "secretToken1";
+        final String apiUrl = "/iot-open/sign/device/list";
+
+        stubFor(delete(apiUrl)
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                )
+        );
+
+        HttpRestClient client = new EcoflowHttpRestClient(SERVER_URL, accessToken, secretToken);
+        HttpResponse<String> status = client.delete(apiUrl, null);
+
+        // Verify the request
+        verify(deleteRequestedFor(urlEqualTo(apiUrl))
+                .withHeader("accessKey", matching(accessToken))
+                .withHeader("timestamp", matching(".*"))
+                .withHeader("nonce", matching(".*"))
+                .withHeader("sign", matching(".*")));
+
+        // Assert response
+        assertEquals(200, status.statusCode());
+        assertEquals("application/json", status.headers().firstValue("Content-Type").orElse(null));
+    }
 }
